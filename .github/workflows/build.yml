@@ -23,7 +23,7 @@ jobs:
         ./gradlew :module:assembleRelease
 
         # Create target_package.txt
-        echo "# Target package for Zygisk-Il2CppDumper" > target_package.txt
+        # echo "# Target package for Zygisk-Il2CppDumper" > target_package.txt
         echo "${{ github.event.inputs.package_name }}" >> target_package.txt
 
         # Copy it into the Magisk module root

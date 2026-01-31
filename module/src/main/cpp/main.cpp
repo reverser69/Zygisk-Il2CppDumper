@@ -33,23 +33,25 @@ void tryReadPackageNameFromFile() {
                 if (fgets(buffer, sizeof(buffer), file)) {
                     // Clean up the line
                     char* line = buffer;
-                    
-                    // Remove trailing newline
-                    size_t len = strlen(line);
-                    if (len > 0 && line[len-1] == '\n') line[len-1] = '\0';
-                    if (len > 0 && line[len-1] == '\r') line[len-1] = '\0';
-                    
-                    // Remove comments
-                    char* comment = strchr(line, '#');
-                    if (comment) *comment = '\0';
-                    
-                    // Trim whitespace
-                    while (*line == ' ' || *line == '\t') line++;
-                    char* end = line + strlen(line) - 1;
-                    while (end > line && (*end == ' ' || *end == '\t' || *end == '\n' || *end == '\r')) {
-                        *end = '\0';
-                        end--;
-                    }
+
+                    // Strip newline early
+                    line[strcspn(line, "\r\n")] = '\0';
+
+                   // Strip comments
+                   char* comment = strchr(line, '#');
+                   if (comment) *comment = '\0';
+
+                  // Trim leading
+                  while (*line == ' ' || *line == '\t')
+                          line++;
+
+                // Trim trailing
+                char* end = line + strlen(line);
+                while (end > line && (end[-1] == ' ' || end[-1] == '\t'))
+                    *--end = '\0';
+
+                if (*line == '\0')
+                    return;  // empty or comment-only line
                     
                     if (strlen(line) > 0) {
                         static char loadedName[256];

@@ -20,7 +20,6 @@ using zygisk::ServerSpecializeArgs;
 const char *GamePackageName = "com.your.default.package";
 
 void tryReadPackageNameFromFile() {
-        // Try storage root first (most user-friendly)
         const char* possiblePaths[] = {
             "/sdcard/target_package.txt",
             "/storage/emulated/0/target_package.txt",
@@ -28,36 +27,45 @@ void tryReadPackageNameFromFile() {
         };
         
         for (const char* path : possiblePaths) {
-            if (access(path, R_OK) == 0) {
-                std::ifstream file(path);
-                if (file.is_open()) {
-                    std::string line;
-                    if (std::getline(file, line)) {
-                        // Remove comments (lines starting with #)
-                        size_t commentPos = line.find('#');
-                        if (commentPos != std::string::npos) {
-                            line = line.substr(0, commentPos);
-                        }
-                        
-                        // Trim whitespace
-                        line.erase(0, line.find_first_not_of(" \t\r\n"));
-                        line.erase(line.find_last_not_of(" \t\r\n") + 1);
-                        
-                        if (!line.empty() && line.find_first_not_of('.') != std::string::npos) {
-                            static std::string loadedName = line;
-                            GamePackageName = loadedName.c_str();
-                            LOGI("Il2CppDumper: Loaded package name from %s: %s", 
-                                 path, GamePackageName);
-                            file.close();
-                            return;
-                        }
+            FILE* file = fopen(path, "r");
+            if (file) {
+                char buffer[256];
+                if (fgets(buffer, sizeof(buffer), file)) {
+                    // Clean up the line
+                    char* line = buffer;
+                    
+                    // Remove trailing newline
+                    size_t len = strlen(line);
+                    if (len > 0 && line[len-1] == '\n') line[len-1] = '\0';
+                    if (len > 0 && line[len-1] == '\r') line[len-1] = '\0';
+                    
+                    // Remove comments
+                    char* comment = strchr(line, '#');
+                    if (comment) *comment = '\0';
+                    
+                    // Trim whitespace
+                    while (*line == ' ' || *line == '\t') line++;
+                    char* end = line + strlen(line) - 1;
+                    while (end > line && (*end == ' ' || *end == '\t' || *end == '\n' || *end == '\r')) {
+                        *end = '\0';
+                        end--;
                     }
-                    file.close();
+                    
+                    if (strlen(line) > 0) {
+                        static char loadedName[256];
+                        strncpy(loadedName, line, sizeof(loadedName)-1);
+                        loadedName[sizeof(loadedName)-1] = '\0';
+                        GamePackageName = loadedName;
+                        LOGI("Loaded package name from %s: %s", path, GamePackageName);
+                        fclose(file);
+                        return;
+                    }
                 }
+                fclose(file);
             }
         }
         
-        LOGI("Il2CppDumper: Using default package name: %s", GamePackageName);
+        LOGI("No target_package.txt found, using default: %s", GamePackageName);
     }
 
 

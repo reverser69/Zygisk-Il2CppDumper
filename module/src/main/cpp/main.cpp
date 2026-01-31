@@ -16,6 +16,15 @@ using zygisk::AppSpecializeArgs;
 using zygisk::ServerSpecializeArgs;
 
 
+// ==================== LOGGING SYSTEM ====================
+#define LOG_TAG "Il2CppDumper"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+// ========================================================
+
+
 // Define the variable with your default
 const char *GamePackageName = "com.your.default.package";
 
@@ -75,6 +84,8 @@ public:
         this->api = api;
         this->env = env;
 
+        LOGI("[ENTRY] Zygisk-Il2CppDumper entry point called");
+
         // Read package name from file
         tryReadPackageNameFromFile();
         
@@ -105,6 +116,7 @@ private:
     size_t length;
 
     void preSpecialize(const char *package_name, const char *app_data_dir) {
+        LOGD("[ZYGISK] Checking app: %s against target: %s", app_data_dir, package_name);
         if (strcmp(package_name, GamePackageName) == 0) {
             LOGI("detect game: %s", package_name);
             enable_hack = true;

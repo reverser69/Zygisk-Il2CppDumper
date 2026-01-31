@@ -59,7 +59,7 @@ void tryReadPackageNameFromFile() {
         
         LOGI("Il2CppDumper: Using default package name: %s", GamePackageName);
     }
-}
+
 
 class MyModule : public zygisk::ModuleBase {
 public:

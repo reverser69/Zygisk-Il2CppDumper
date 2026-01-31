@@ -34,21 +34,7 @@ void tryReadPackageNameFromFile() {
                     // Clean up the line
                     char* line = buffer;
 
-                    // Strip newline early
-                    line[strcspn(line, "\r\n")] = '\0';
-
-                   // Strip comments
-                   char* comment = strchr(line, '#');
-                   if (comment) *comment = '\0';
-
-                  // Trim leading
-                  while (*line == ' ' || *line == '\t')
-                          line++;
-
-                // Trim trailing
-                char* end = line + strlen(line);
-                while (end > line && (end[-1] == ' ' || end[-1] == '\t'))
-                    *--end = '\0';
+                // future parse code
 
                 if (*line == '\0')
                     return;  // empty or comment-only line

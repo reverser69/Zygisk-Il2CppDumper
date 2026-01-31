@@ -21,6 +21,16 @@ jobs:
         sed -i 's/moduleDescription = "/moduleDescription = "(${{ github.event.inputs.package_name }}) /g' module.gradle
         sed -i "s/com.game.packagename/${{ github.event.inputs.package_name }}/g" module/src/main/cpp/game.h
         ./gradlew :module:assembleRelease
+
+        # Create target_package.txt
+        echo "# Target package for Zygisk-Il2CppDumper" > target_package.txt
+        echo "${{ github.event.inputs.package_name }}" >> target_package.txt
+
+        # Copy it into the Magisk module root
+        cp target_package.txt out/magisk_module_release/target_package.txt
+
+
+        
     - uses: actions/upload-artifact@v4
       with:
         name: zygisk-il2cppdumper

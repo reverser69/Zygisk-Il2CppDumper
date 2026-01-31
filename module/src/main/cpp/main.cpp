@@ -16,26 +16,17 @@ using zygisk::AppSpecializeArgs;
 using zygisk::ServerSpecializeArgs;
 
 
-// ==================== LOGGING SYSTEM ====================
-#define LOG_TAG "Il2CppDumper"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-// ========================================================
-
-
 // Define the variable with your default
 const char *GamePackageName = "com.your.default.package";
 
 void tryReadPackageNameFromFile() {
         const char* possiblePaths[] = {
-            "/sdcard/target_package.txt",
-            "/storage/emulated/0/target_package.txt",
+            "/sdcard/target_package.txt", // not readable, for demonstration and future use
             "/data/adb/modules/zygisk_il2cppdumper/target_package.txt"
         };
         
         for (const char* path : possiblePaths) {
+            LOGI("Searching for target_package.txt in: %s", path);
             FILE* file = fopen(path, "r");
             if (file) {
                 char buffer[256];
@@ -73,7 +64,6 @@ void tryReadPackageNameFromFile() {
                 fclose(file);
             }
         }
-        
         LOGI("No target_package.txt found, using default: %s", GamePackageName);
     }
 
@@ -83,13 +73,6 @@ public:
     void onLoad(Api *api, JNIEnv *env) override {
         this->api = api;
         this->env = env;
-
-        LOGI("[ENTRY] Zygisk-Il2CppDumper entry point called");
-
-        // Read package name from file
-        tryReadPackageNameFromFile();
-        
-        LOGI("Il2CppDumper: Module loaded for package: %s", GamePackageName);
     }
 
     void preAppSpecialize(AppSpecializeArgs *args) override {
@@ -116,7 +99,15 @@ private:
     size_t length;
 
     void preSpecialize(const char *package_name, const char *app_data_dir) {
-        LOGD("[ZYGISK] Checking app: %s against target: %s", app_data_dir, package_name);
+        
+        // Read package name from file
+        static bool fileRead = false;
+        if (!fileRead) {
+            tryReadPackageNameFromFile();
+            fileRead = true;
+        }
+        
+        LOGD("[Il2CppDumper] Checking app: %s against target: %s", app_data_dir, package_name);
         if (strcmp(package_name, GamePackageName) == 0) {
             LOGI("detect game: %s", package_name);
             enable_hack = true;

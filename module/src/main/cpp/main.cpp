@@ -59,7 +59,8 @@ void tryReadPackageNameFromFile() {
                         LOGI("Loaded package name from %s: %s", path, GamePackageName);
                         fclose(file);
                         return;
-                    }
+                    } else
+                            LOGI("No package name read from: %s", path);
                 }
                 fclose(file);
             }
@@ -107,7 +108,7 @@ private:
             fileRead = true;
         }
         
-        LOGD("[Il2CppDumper] Checking app: %s against target: %s", app_data_dir, package_name);
+        LOGI("Checking app: %s against target: %s", app_data_dir, GamePackageName);
         if (strcmp(package_name, GamePackageName) == 0) {
             LOGI("detect game: %s", package_name);
             enable_hack = true;

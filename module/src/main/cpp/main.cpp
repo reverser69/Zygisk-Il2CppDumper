@@ -103,10 +103,11 @@ private:
             tryReadPackageNameFromFile();
             fileRead = true;
         }
-        
-        LOGD("Checking app: %s against target: %s", app_data_dir, GamePackageName);
+
+        // these logs are done in context of the process we target
+        LOGD("[Zygisk] Application: %s being checked against target: %s", app_data_dir, GamePackageName);
         if (strcmp(package_name, GamePackageName) == 0) {
-            LOGI("detected game: %s", package_name);
+            LOGI("[Zygisk] Detected target package: %s", package_name);
             enable_hack = true;
             game_data_dir = new char[strlen(app_data_dir) + 1];
             strcpy(game_data_dir, app_data_dir);

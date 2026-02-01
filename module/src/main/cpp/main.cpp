@@ -34,8 +34,16 @@ void tryReadPackageNameFromFile() {
                     // Clean up the line
                     char* line = buffer;
 
-                // future parse code
+                // 1. Future parse code
+                        
+                // 2. Remove newline characters (\n or \r\n)
+                line[strcspn(line, "\r\n")] = '\0';
 
+                // 3. Trim leading whitespace
+                while (*line == ' ' || *line == '\t')
+                    line++;
+
+                        
                 if (*line == '\0')
                     return;  // empty or comment-only line
                     

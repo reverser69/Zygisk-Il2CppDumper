@@ -26,7 +26,7 @@ void tryReadPackageNameFromFile() {
         };
         
         for (const char* path : possiblePaths) {
-            LOGI("Searching for target_package.txt in: %s", path);
+            LOGD("Searching for target_package.txt in: %s", path);
             FILE* file = fopen(path, "r");
             if (file) {
                 char buffer[256];
@@ -44,7 +44,7 @@ void tryReadPackageNameFromFile() {
                         strncpy(loadedName, line, sizeof(loadedName)-1);
                         loadedName[sizeof(loadedName)-1] = '\0';
                         GamePackageName = loadedName;
-                        LOGI("Loaded package name from %s: %s", path, GamePackageName);
+                        LOGD("Loaded package name from %s: %s", path, GamePackageName);
                         fclose(file);
                         return;
                     } else
@@ -96,9 +96,9 @@ private:
             fileRead = true;
         }
         
-        LOGI("Checking app: %s against target: %s", app_data_dir, GamePackageName);
+        LOGD("Checking app: %s against target: %s", app_data_dir, GamePackageName);
         if (strcmp(package_name, GamePackageName) == 0) {
-            LOGI("detect game: %s", package_name);
+            LOGI("detected game: %s", package_name);
             enable_hack = true;
             game_data_dir = new char[strlen(app_data_dir) + 1];
             strcpy(game_data_dir, app_data_dir);
